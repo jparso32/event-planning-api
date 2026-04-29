@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+
+  events      Event[]
+  venues      Venue[]
+  invitations Invitation[]
+}
+
+model Venue {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  name     String
+  address  String
+  city     String
+  state    String
+  capacity Int
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events Event[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  venueId     Int
+  title       String
+  description String?
+  eventDate   DateTime
+  startTime   String
+  endTime     String
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  venue       Venue        @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  invitations Invitation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Invitation {
+  id         Int    @id @default(autoincrement())
+  userId     Int
+  eventId    Int
+  guestName  String
+  guestEmail String
+  rsvpStatus String @default("pending")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
