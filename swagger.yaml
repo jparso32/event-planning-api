@@ -5,7 +5,7 @@ info:
   description: API documentation for Event Planning App
 
 servers:
-  - url: http://localhost:3000
+  - url: https://event-planning-api-hcgn.onrender.com
 
 tags:
   - name: Auth
